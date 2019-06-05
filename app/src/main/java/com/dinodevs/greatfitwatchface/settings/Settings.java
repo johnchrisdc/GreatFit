@@ -3,6 +3,8 @@ package com.dinodevs.greatfitwatchface.settings;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.dinodevs.greatfitwatchface.CustomDataUpdater;
 import com.dinodevs.greatfitwatchface.GreatFitSlpt;
 import com.dinodevs.greatfitwatchface.R;
 
@@ -95,14 +96,30 @@ public class Settings extends FragmentActivity {
             }
         }, null));
 
+        // Add about
+        settings.add(new IconSetting(getDrawable(R.drawable.info), getString(R.string.about), getString(R.string.about_c), new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Get pkg info
+                String version = "n/a";
+                try {
+                    PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                    version = pInfo.versionName;
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                // Please do not change the following line
+                Toast.makeText(getApplicationContext(), "GreatFit Project\nVersion: "+ version +"\nAuthor: GreatApo\nStyle: "+getResources().getString(R.string.author), Toast.LENGTH_LONG).show();
+            }
+        }, null));
+
         //Add save button
         settings.add(new ButtonSetting(getString(R.string.save), getDrawable(R.drawable.green_button), new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Restart watchface
                 Settings.this.sendBroadcast(new Intent("com.huami.intent.action.WATCHFACE_CONFIG_CHANGED"));
-                // Start CustomDataUpdater service
-                startService(new Intent(getApplicationContext(), CustomDataUpdater.class));
                 // Slpt some times doesn't run
                 startService(new Intent(getApplicationContext(), GreatFitSlpt.class));
                 // Kill this
@@ -119,8 +136,6 @@ public class Settings extends FragmentActivity {
                 Toast.makeText(view.getContext(), "Settings reset", Toast.LENGTH_SHORT).show();
                 // Restart watchface
                 Settings.this.sendBroadcast(new Intent("com.huami.intent.action.WATCHFACE_CONFIG_CHANGED"));
-                // Start CustomDataUpdater service
-                startService(new Intent(getApplicationContext(), CustomDataUpdater.class));
                 // Slpt some times doesn't run
                 startService(new Intent(getApplicationContext(), GreatFitSlpt.class));
                 // Kill this

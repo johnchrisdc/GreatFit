@@ -17,6 +17,8 @@
     <string name="progress_widget_c">Select progress bar to display</string>
     <string name="language">Language</string>
     <string name="language_c">Select display language</string>
+    <string name="about">About</string>
+    <string name="about_c">Project info</string>
 
     <string name="set_elements">Set widget</string>
     <string name="set_progress_bar">Set bar</string>
@@ -75,6 +77,7 @@
 
     <!-- languages -->
     <string name="English">English</string>
+    <string name="Bulgarian">Български</string>
     <string name="Chinese">中文</string>
     <string name="Croatian">Hrvatski</string>
     <string name="Czech">Czech</string>

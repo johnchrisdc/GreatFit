@@ -82,11 +82,17 @@ public class FloorWidget extends AbstractWidget {
         //better_resolution = better_resolution && settings.better_resolution_when_raising_hand;
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
 
+        // Do not show in SLPT (but show on raise of hand)
+        boolean show_all = (!settings.clock_only_slpt || better_resolution);
+        if (!show_all)
+            return slpt_objects;
+
+
         if(settings.floors>0){
             // Show or Not icon
             if (settings.floorsIcon) {
                 SlptPictureView floorsIcon = new SlptPictureView();
-                floorsIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"icons/floors.png") );
+                floorsIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"26wc_":"slpt_" )+"icons/floors.png") );
                 floorsIcon.setStart(
                         (int) settings.floorsIconLeft,
                         (int) settings.floorsIconTop
@@ -110,7 +116,7 @@ public class FloorWidget extends AbstractWidget {
                 // If text is centered, set rectangle
                 floorsLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.floorsFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.floorsFontSize)
                 );
                 tmp_left = -320;
             }

@@ -202,12 +202,17 @@ public class HeartRateWidget extends AbstractWidget {
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
         int tmp_left;
 
+        // Do not show in SLPT (but show on raise of hand)
+        boolean show_all = (!settings.clock_only_slpt || better_resolution);
+        if (!show_all)
+            return slpt_objects;
+
         // Draw heart rate element
         if(settings.heart_rate>0) {
             // Show or Not icon
             if (settings.heart_rateIcon) {
                 SlptPictureView heart_rateIcon = new SlptPictureView();
-                heart_rateIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"icons/heart_rate.png") );
+                heart_rateIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"26wc_":"slpt_" )+"icons/heart_rate.png") );
                 heart_rateIcon.setStart(
                         (int) settings.heart_rateIconLeft,
                         (int) settings.heart_rateIconTop
@@ -236,7 +241,7 @@ public class HeartRateWidget extends AbstractWidget {
                 // If text is centered, set rectangle
                 heart.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.heart_rateFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.heart_rateFontSize)
                 );
                 tmp_left = -320;
             }

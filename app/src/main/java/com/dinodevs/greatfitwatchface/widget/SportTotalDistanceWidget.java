@@ -88,12 +88,17 @@ public class SportTotalDistanceWidget extends AbstractWidget {
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
         int tmp_left;
 
+        // Do not show in SLPT (but show on raise of hand)
+        boolean show_all = (!settings.clock_only_slpt || better_resolution);
+        if (!show_all)
+            return slpt_objects;
+
         // Show total Sport's Distance
         if(settings.total_distance>0){
             // Show or Not icon
             if (settings.total_distanceIcon) {
                 SlptPictureView total_distanceIcon = new SlptPictureView();
-                total_distanceIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"icons/total_distance.png") );
+                total_distanceIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"26wc_":"slpt_" )+"icons/total_distance.png") );
                 total_distanceIcon.setStart(
                         (int) settings.total_distanceIconLeft,
                         (int) settings.total_distanceIconTop
@@ -127,7 +132,7 @@ public class SportTotalDistanceWidget extends AbstractWidget {
                 // If text is centered, set rectangle
                 distance.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) settings.total_distanceFontSize
+                        (int) (((float)settings.font_ratio/100)*settings.total_distanceFontSize)
                 );
                 tmp_left = -320;
             }

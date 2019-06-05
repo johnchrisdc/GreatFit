@@ -325,6 +325,11 @@ public class WeatherWidget extends AbstractWidget {
         better_resolution = better_resolution && settings.better_resolution_when_raising_hand;
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
 
+        // Do not show in SLPT (but show on raise of hand)
+        boolean show_all = (!settings.clock_only_slpt || better_resolution);
+        if (!show_all)
+            return slpt_objects;
+
         // Get weather data
         this.mService = service;
         this.weather = getSlptWeather();
@@ -361,7 +366,7 @@ public class WeatherWidget extends AbstractWidget {
                 // If text is centered, set rectangle
                 temperatureLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.temperatureFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.temperatureFontSize)
                 );
                 tmp_left = -320;
             }
@@ -375,7 +380,7 @@ public class WeatherWidget extends AbstractWidget {
         // Weather Icons
         if(settings.weather_img>0){
             SlptPictureView weatherIcon = new SlptPictureView();
-            weatherIcon.setImagePicture( SimpleFile.readFileFromAssets(service, String.format(( (better_resolution)?"":"slpt_" )+"weather/%s.png", this.weatherImageStrList.get(this.weather.weatherType))) );
+            weatherIcon.setImagePicture( SimpleFile.readFileFromAssets(service, String.format(( (better_resolution)?"26wc_":"slpt_" )+"weather/%s.png", this.weatherImageStrList.get(this.weather.weatherType))) );
             weatherIcon.setStart(
                     (int) settings.weather_imgIconLeft,
                     (int) settings.weather_imgIconTop
@@ -401,7 +406,7 @@ public class WeatherWidget extends AbstractWidget {
                     // If text is centered, set rectangle
                     weatherLayout.setRect(
                             (int) (2 * tmp_left + 640),
-                            (int) (settings.weather_imgFontSize)
+                            (int) (((float)settings.font_ratio/100)*settings.weather_imgFontSize)
                     );
                     tmp_left = -320;
                 }
@@ -418,7 +423,7 @@ public class WeatherWidget extends AbstractWidget {
             // Show or Not icon
             if (settings.cityIcon) {
                 SlptPictureView cityIcon = new SlptPictureView();
-                cityIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"icons/city.png") );
+                cityIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"26wc_":"slpt_" )+"icons/city.png") );
                 cityIcon.setStart(
                         (int) settings.cityIconLeft,
                         (int) settings.cityIconTop
@@ -448,7 +453,7 @@ public class WeatherWidget extends AbstractWidget {
                 // If text is centered, set rectangle
                 cityLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.cityFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.cityFontSize)
                 );
                 tmp_left = -320;
             }
@@ -464,7 +469,7 @@ public class WeatherWidget extends AbstractWidget {
             // Show or Not icon
             if (settings.humidityIcon) {
                 SlptPictureView humidityIcon = new SlptPictureView();
-                humidityIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"icons/humidity.png") );
+                humidityIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"26wc_":"slpt_" )+"icons/humidity.png") );
                 humidityIcon.setStart(
                         (int) settings.humidityIconLeft,
                         (int) settings.humidityIconTop
@@ -494,7 +499,7 @@ public class WeatherWidget extends AbstractWidget {
                 // If text is centered, set rectangle
                 humidityLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.humidityFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.humidityFontSize)
                 );
                 tmp_left = -320;
             }
@@ -510,7 +515,7 @@ public class WeatherWidget extends AbstractWidget {
             // Show or Not icon
             if (settings.uvIcon) {
                 SlptPictureView uvIcon = new SlptPictureView();
-                uvIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"icons/uv.png") );
+                uvIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"26wc_":"slpt_" )+"icons/uv.png") );
                 uvIcon.setStart(
                         (int) settings.uvIconLeft,
                         (int) settings.uvIconTop
@@ -540,7 +545,7 @@ public class WeatherWidget extends AbstractWidget {
                 // If text is centered, set rectangle
                 uvLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.uvFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.uvFontSize)
                 );
                 tmp_left = -320;
             }
@@ -556,7 +561,7 @@ public class WeatherWidget extends AbstractWidget {
             // Show or Not icon
             if (settings.wind_directionIcon) {
                 SlptPictureView wind_directionIcon = new SlptPictureView();
-                wind_directionIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"icons/wind_direction.png") );
+                wind_directionIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"26wc_":"slpt_" )+"icons/wind_direction.png") );
                 wind_directionIcon.setStart(
                         (int) settings.wind_directionIconLeft,
                         (int) settings.wind_directionIconTop
@@ -586,7 +591,7 @@ public class WeatherWidget extends AbstractWidget {
                 // If text is centered, set rectangle
                 wind_directionLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.wind_directionFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.wind_directionFontSize)
                 );
                 tmp_left = -320;
             }
@@ -602,7 +607,7 @@ public class WeatherWidget extends AbstractWidget {
             // Show or Not icon
             if (settings.wind_strengthIcon) {
                 SlptPictureView wind_strengthIcon = new SlptPictureView();
-                wind_strengthIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"icons/wind_strength.png") );
+                wind_strengthIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"26wc_":"slpt_" )+"icons/wind_strength.png") );
                 wind_strengthIcon.setStart(
                         (int) settings.wind_strengthIconLeft,
                         (int) settings.wind_strengthIconTop
@@ -631,7 +636,7 @@ public class WeatherWidget extends AbstractWidget {
                 // If text is centered, set rectangle
                 wind_strengthLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.wind_strengthFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.wind_strengthFontSize)
                 );
                 tmp_left = -320;
             }

@@ -129,12 +129,17 @@ public class SportTodayDistanceWidget extends AbstractWidget {
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
         int tmp_left;
 
+        // Do not show in SLPT (but show on raise of hand)
+        boolean show_all = (!settings.clock_only_slpt || better_resolution);
+        if (!show_all)
+            return slpt_objects;
+
         // Show Today Sport's Distance
         if(settings.today_distance>0){
             // Show or Not icon
             if (settings.today_distanceIcon) {
                 SlptPictureView today_distanceIcon = new SlptPictureView();
-                today_distanceIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"icons/today_distance.png") );
+                today_distanceIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"26wc_":"slpt_" )+"icons/today_distance.png") );
                 today_distanceIcon.setStart(
                         (int) settings.today_distanceIconLeft,
                         (int) settings.today_distanceIconTop
@@ -168,7 +173,7 @@ public class SportTodayDistanceWidget extends AbstractWidget {
                 // If text is centered, set rectangle
                 distance.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) settings.today_distanceFontSize
+                        (int) (((float)settings.font_ratio/100)*settings.today_distanceFontSize)
                 );
                 tmp_left = -320;
             }
@@ -191,12 +196,12 @@ public class SportTodayDistanceWidget extends AbstractWidget {
             // Draw background image
             if(settings.today_distanceProgBgBool) {
                 SlptPictureView ring_background = new SlptPictureView();
-                ring_background.setImagePicture(SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"circles/ring1__bg.png"));
+                ring_background.setImagePicture(SimpleFile.readFileFromAssets(service, ((settings.isVerge())?"verge_":( (better_resolution)?"":"slpt_" ))+"circles/ring1__bg.png"));
                 slpt_objects.add(ring_background);
             }
 
             SlptTodayDistanceArcAnglePicView today_distanceArcAnglePicView = new SlptTodayDistanceArcAnglePicView();
-            today_distanceArcAnglePicView.setImagePicture(SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+settings.today_distanceProgSlptImage));
+            today_distanceArcAnglePicView.setImagePicture(SimpleFile.readFileFromAssets(service, ((settings.isVerge())?"verge_":( (better_resolution)?"":"slpt_" ))+settings.today_distanceProgSlptImage));
             today_distanceArcAnglePicView.setStart((int) settings.today_distanceProgLeft, (int) settings.today_distanceProgTop);
             today_distanceArcAnglePicView.start_angle = settings.today_distanceProgStartAngle;
             today_distanceArcAnglePicView.len_angle = 0;

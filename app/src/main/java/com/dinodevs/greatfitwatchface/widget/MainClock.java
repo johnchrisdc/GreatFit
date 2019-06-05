@@ -1,10 +1,6 @@
 package com.dinodevs.greatfitwatchface.widget;
 
 import android.app.Service;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -15,10 +11,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.dinodevs.greatfitwatchface.AbstractWatchFace;
+import com.dinodevs.greatfitwatchface.resource.SlptAnalogHourView;
 import com.dinodevs.greatfitwatchface.resource.SlptSecondHView;
 import com.dinodevs.greatfitwatchface.resource.SlptSecondLView;
 import com.dinodevs.greatfitwatchface.settings.LoadSettings;
 import com.huami.watch.watchface.util.Util;
+import com.ingenic.iwds.slpt.view.analog.SlptAnalogMinuteView;
+import com.ingenic.iwds.slpt.view.analog.SlptAnalogSecondView;
 import com.ingenic.iwds.slpt.view.core.SlptLinearLayout;
 import com.ingenic.iwds.slpt.view.core.SlptNumView;
 import com.ingenic.iwds.slpt.view.core.SlptPictureView;
@@ -49,32 +48,21 @@ import com.ingenic.iwds.slpt.view.utils.SimpleFile;
 
 public class MainClock extends DigitalClockWidget {
 
-    private TextPaint hourFont;
-    private TextPaint minutesFont;
-    private TextPaint secondsFont;
-    private TextPaint indicatorFont;
-    private TextPaint dateFont;
-    private TextPaint dayFont;
-    private TextPaint weekdayFont;
-    private TextPaint monthFont;
-    private TextPaint yearFont;
-
-    private Bitmap dateIcon;
-
-    //private Drawable background;
-    private Bitmap background;
+    private TextPaint hourFont, minutesFont, secondsFont, indicatorFont, dateFont, dayFont, weekdayFont, monthFont, yearFont;
+    private Bitmap dateIcon, hourHand, minuteHand, secondsHand, background;
 
     private String[] digitalNums = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
     private String[] digitalNumsNo0 = {"", "1", "2", "3", "4", "5", "6", "7", "8", "9"};//no 0 on first digit
 
     // Languages
     public static String[] codes = {
-            "English", "中文", "Hrvatski", "Czech", "Nederlands", "Français", "Deutsch", "Ελληνικά", "עברית", "Magyar", "Italiano", "日本語", "한국어", "Polski", "Português", "Română", "Русский", "Slovenčina", "Español", "ไทย", "Türkçe"
+            "English", "Български", "中文", "Hrvatski", "Czech", "Nederlands", "Français", "Deutsch", "Ελληνικά", "עברית", "Magyar", "Italiano", "日本語", "한국어", "Polski", "Português", "Română", "Русский", "Slovenčina", "Español", "ไทย", "Türkçe"
     };
 
     private static String[][] days = {
             //{"SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"},
             {"SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"},
+            {"ПОНЕДЕЛНИК", "ВТОРНИК", "СРЯДА", "ЧЕТВЪРТЪК", "ПЕТЪК", "СЪБОТА", "НЕДЕЛЯ"},
             {"星期天", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"},
             {"NEDJELJA", "PONEDJELJAK", "UTORAK", "SRIJEDA", "ČETVRTAK", "PETAK", "SUBOTA"},
             {"NEDĚLE","PONDĚLÍ", "ÚTERÝ", "STŘEDA", "ČTVRTEK", "PÁTEK", "SOBOTA"},
@@ -100,6 +88,7 @@ public class MainClock extends DigitalClockWidget {
     public static String[][] days_3let = {
             //{"SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"},
             {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"},
+            {"ПОН", "ВТО", "СРЯ", "ЧЕТ", "ПЕТ", "СЪБ", "НЕД"},
             {"星期天", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"},
             {"NED", "PON", "UTO", "SRI", "ČET", "PET", "SUB"},
             {"NE", "PO", "ÚT", "ST", "ČT", "PÁ", "SO"},
@@ -125,6 +114,7 @@ public class MainClock extends DigitalClockWidget {
     private static String[][] months = {
             //{"DECEMBER", "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"},
             {"DECEMBER", "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"},
+            {"ДЕКЕМВРИ", "ЯНУАРИ", "ФЕВРУАРИ", "МАРТ", "АПРИЛ", "МАЙ", "ЮНИ", "ЮЛИ", "АВГУСТ", "СЕПТЕМВРИ", "ОКТОМВРИ", "НОЕМВРИ" , "ДЕКЕМВРИ"},
             {"十二月", "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"},
             {"PROSINAC", "SIJEČANJ", "VELJAČA", "OŽUJAK", "TRAVANJ", "SVIBANJ", "LIPANJ", "SRPANJ", "KOLOVOZ", "RUJAN", "LISTOPAD", "STUDENI", "PROSINAC"},
             {"PROSINEC", "LEDEN", "ÚNOR", "BŘEZEN", "DUBEN", "KVĚTEN", "ČERVEN", "ČERVENEC", "SRPEN", "ZÁŘÍ", "ŘÍJEN", "LISTOPAD", "PROSINEC"},
@@ -150,8 +140,9 @@ public class MainClock extends DigitalClockWidget {
     private static String[][] months_3let = {
             //{"DECEMBER", "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"},
             {"DEC", "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"},
-            {"十二月", "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十二月"},
-            {"PRO", "SIJ", "VE", "OŽU", "TRA", "SVI", "LIP", "SRP", "KOL", "RUJ", "LIS", "STU", "PRO", "PRO"},
+            {"ДЕК", "ЯНУ", "ФЕВ", "МАР", "АПР", "МАЙ", "ЮНИ", "ЮЛИ", "АВГ", "СЕП", "ОКТ", "НОЕ", "ДЕК"},
+            {"十二月", "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"},
+            {"PRO", "SIJ", "VE", "OŽU", "TRA", "SVI", "LIP", "SRP", "KOL", "RUJ", "LIS", "STU", "PRO"},
             {"PRO", "LED", "ÚNO", "BŘE", "DUB", "KVĚ", "ČER", "ČER", "SRP", "ZÁŘ", "ŘÍJ", "LIS", "PRO"},
             {"DEC", "JAN", "FEB", "MAA", "APR", "MEI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEC"},
             {"DÉC", "JAN", "FÉV", "MAR", "AVR", "MAI", "JUI", "JUI", "AOÛ", "SEP", "OCT", "NOV", "DÉC"},
@@ -180,45 +171,43 @@ public class MainClock extends DigitalClockWidget {
 
     @Override
     public void init(Service service) {
-        // Get pkg info
-        String version = "n/a";
-        try {
-            PackageInfo pInfo = service.getPackageManager().getPackageInfo(service.getPackageName(), 0);
-            version = pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        // Please do not change the following line
-        Toast.makeText(service, "GreatFit "+ version +" by GreatApo, style by "+service.getResources().getString(R.string.author), Toast.LENGTH_LONG).show();
-
         //this.background = service.getResources().getDrawable(R.drawable.background); //todo
         //this.background.setBounds(0, 0, 320, 300);
         this.background = Util.decodeImage(service.getResources(),"background.png");
+        if(settings.isVerge())
+            this.background = Bitmap.createScaledBitmap(this.background, 360, 336, true);// 336 because it is scaled from 300px and not 320px
 
-        this.hourFont = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-        this.hourFont.setTypeface(ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE));
-        this.hourFont.setTextSize(settings.hoursFontSize);
-        this.hourFont.setColor(settings.hoursColor);
-        this.hourFont.setTextAlign((settings.hoursAlignLeft)? Paint.Align.LEFT : Paint.Align.CENTER);
+        if(settings.digital_clock) {
+            this.hourFont = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+            this.hourFont.setTypeface(ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE));
+            this.hourFont.setTextSize(settings.hoursFontSize);
+            this.hourFont.setColor(settings.hoursColor);
+            this.hourFont.setTextAlign((settings.hoursAlignLeft) ? Paint.Align.LEFT : Paint.Align.CENTER);
 
-        this.minutesFont = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-        this.minutesFont.setTypeface(ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE));
-        this.minutesFont.setTextSize(settings.minutesFontSize);
-        this.minutesFont.setColor(settings.minutesColor);
-        this.minutesFont.setTextAlign((settings.minutesAlignLeft)? Paint.Align.LEFT : Paint.Align.CENTER);
+            this.minutesFont = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+            this.minutesFont.setTypeface(ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE));
+            this.minutesFont.setTextSize(settings.minutesFontSize);
+            this.minutesFont.setColor(settings.minutesColor);
+            this.minutesFont.setTextAlign((settings.minutesAlignLeft) ? Paint.Align.LEFT : Paint.Align.CENTER);
 
-        this.secondsFont = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-        this.secondsFont.setTypeface(ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE));
-        this.secondsFont.setTextSize(settings.secondsFontSize);
-        this.secondsFont.setColor(settings.secondsColor);
-        this.secondsFont.setTextAlign((settings.secondsAlignLeft)? Paint.Align.LEFT : Paint.Align.CENTER);
+            this.secondsFont = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+            this.secondsFont.setTypeface(ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE));
+            this.secondsFont.setTextSize(settings.secondsFontSize);
+            this.secondsFont.setColor(settings.secondsColor);
+            this.secondsFont.setTextAlign((settings.secondsAlignLeft) ? Paint.Align.LEFT : Paint.Align.CENTER);
 
-        this.indicatorFont = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-        this.indicatorFont.setTypeface(ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE));
-        this.indicatorFont.setTextSize(settings.indicatorFontSize);
-        this.indicatorFont.setColor(settings.indicatorColor);
-        this.indicatorFont.setTextAlign((settings.indicatorAlignLeft)? Paint.Align.LEFT : Paint.Align.CENTER);
+            this.indicatorFont = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+            this.indicatorFont.setTypeface(ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE));
+            this.indicatorFont.setTextSize(settings.indicatorFontSize);
+            this.indicatorFont.setColor(settings.indicatorColor);
+            this.indicatorFont.setTextAlign((settings.indicatorAlignLeft) ? Paint.Align.LEFT : Paint.Align.CENTER);
+        }
+
+        if(settings.analog_clock) {
+            this.hourHand = Util.decodeImage(service.getResources(),"timehand/hour"+ ((settings.isVerge())?"_verge":"") +".png");
+            this.minuteHand = Util.decodeImage(service.getResources(),"timehand/minute"+ ((settings.isVerge())?"_verge":"") +".png");
+            this.secondsHand = Util.decodeImage(service.getResources(),"timehand/seconds"+ ((settings.isVerge())?"_verge":"") +".png");
+        }
 
         if(settings.date>0) {
             this.dateFont = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
@@ -263,11 +252,43 @@ public class MainClock extends DigitalClockWidget {
         //this.background.draw(canvas);
         canvas.drawBitmap(this.background, 0f, 0f, settings.mGPaint);
 
-        // Draw hours
-        canvas.drawText( (settings.no_0_on_hour_first_digit)?hours+"":Util.formatTime(hours), settings.hoursLeft, settings.hoursTop, this.hourFont);
+        if(settings.digital_clock) {
+            // Draw hours
+            canvas.drawText((settings.no_0_on_hour_first_digit) ? hours + "" : Util.formatTime(hours), settings.hoursLeft, settings.hoursTop, this.hourFont);
 
-        // Draw minutes
-        canvas.drawText(Util.formatTime(minutes), settings.minutesLeft, settings.minutesTop, this.minutesFont);
+            // Draw minutes
+            canvas.drawText(Util.formatTime(minutes), settings.minutesLeft, settings.minutesTop, this.minutesFont);
+
+            // Draw Seconds
+            if (settings.secondsBool) {
+                canvas.drawText(Util.formatTime(seconds), settings.secondsLeft, settings.secondsTop, this.secondsFont);
+            }
+
+            // : indicator Draw + Flashing
+            if (settings.indicatorBool) {
+                String indicator = ":";
+                if (seconds % 2 == 0 || !settings.flashing_indicator) { // Draw only on even seconds (flashing : symbol)
+                    canvas.drawText(indicator, settings.indicatorLeft, settings.indicatorTop, this.indicatorFont);
+                }
+            }
+        }
+
+        if(settings.analog_clock) {
+            canvas.save();
+            canvas.rotate(((float) (hours * 30)) + ((((float) minutes) / 60.0f) * 30.0f), 160.0f + (settings.isVerge()?20f:0f), 159.0f + (settings.isVerge()?20f:0f));
+            canvas.drawBitmap(this.hourHand, centerX - this.hourHand.getWidth() / 2f, centerY - this.hourHand.getHeight() / 2f, null);
+            canvas.restore();
+            canvas.save();
+            canvas.rotate((float) (minutes * 6), 160.0f + (settings.isVerge()?20f:0f), 159.0f + (settings.isVerge()?20f:0f));
+            canvas.drawBitmap(this.minuteHand, centerX - this.minuteHand.getWidth() / 2f, centerY - this.minuteHand.getHeight() / 2f, null);
+            canvas.restore();
+            if (settings.secondsBool) {
+                canvas.save();
+                canvas.rotate((float) (seconds * 6), 160.0f + (settings.isVerge() ? 20f : 0f), 159.0f + (settings.isVerge() ? 20f : 0f));
+                canvas.drawBitmap(this.secondsHand, centerX - this.secondsHand.getWidth() / 2f, centerY - this.secondsHand.getHeight() / 2f, null);
+                canvas.restore();
+            }
+        }
 
         // JAVA calendar get/show time library
         Calendar calendar = Calendar.getInstance();
@@ -307,19 +328,6 @@ public class MainClock extends DigitalClockWidget {
         if(settings.yearBool) {
             canvas.drawText(Integer.toString(year), settings.yearLeft, settings.yearTop, this.yearFont);
         }
-
-        // Draw Seconds
-        if(settings.secondsBool) {
-            canvas.drawText(Util.formatTime(seconds), settings.secondsLeft, settings.secondsTop, this.secondsFont);
-        }
-
-        // : indicator Draw + Flashing
-        if(settings.indicatorBool) {
-            String indicator = ":";
-            if (seconds % 2 == 0 || !settings.flashing_indicator) { // Draw only on even seconds (flashing : symbol)
-                canvas.drawText(indicator, settings.indicatorLeft, settings.indicatorTop, this.indicatorFont);
-            }
-        }
     }
 
 
@@ -331,136 +339,166 @@ public class MainClock extends DigitalClockWidget {
 
     public List<SlptViewComponent> buildSlptViewComponent(Service service, boolean better_resolution) {
         better_resolution = better_resolution && settings.better_resolution_when_raising_hand;
+        boolean show_all = (!settings.clock_only_slpt || better_resolution);
 
         int tmp_left;
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
 
         // Draw background image
         SlptPictureView background = new SlptPictureView();
-        background.setImagePicture(SimpleFile.readFileFromAssets(service, "background"+ ((better_resolution)?"_better":"") +"_slpt.png"));
+        background.setImagePicture(SimpleFile.readFileFromAssets(service, "background"+ ((better_resolution)?"_better":"") + ((settings.isVerge())?"_verge":"") +"_slpt.png"));
+        //Alternative way
+        //background.setImagePicture(ResourceManager.getVergeImageFromAssets(settings.isVerge(), service, "background"+ ((better_resolution)?"_better":"") +"_slpt.png"));
         slpt_objects.add(background);
 
         // Set font
         Typeface timeTypeFace = ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE);
 
-        // Draw hours
-        if(settings.hoursBool){
-            SlptLinearLayout hourLayout = new SlptLinearLayout();
-            if(settings.no_0_on_hour_first_digit) {// No 0 on first digit
-                SlptViewComponent firstDigit = new SlptHourHView();
-                ((SlptNumView) firstDigit).setStringPictureArray(this.digitalNumsNo0);
-                hourLayout.add(firstDigit);
-                SlptViewComponent secondDigit = new SlptHourLView();
-                ((SlptNumView) secondDigit).setStringPictureArray(this.digitalNums);
-                hourLayout.add(secondDigit);
-            }else{
-                hourLayout.add(new SlptHourHView());
-                hourLayout.add(new SlptHourLView());
-                hourLayout.setStringPictureArrayForAll(this.digitalNums);
+        if(settings.digital_clock) {
+            // Draw hours
+            if (settings.hoursBool) {
+                SlptLinearLayout hourLayout = new SlptLinearLayout();
+                if (settings.no_0_on_hour_first_digit) {// No 0 on first digit
+                    SlptViewComponent firstDigit = new SlptHourHView();
+                    ((SlptNumView) firstDigit).setStringPictureArray(this.digitalNumsNo0);
+                    hourLayout.add(firstDigit);
+                    SlptViewComponent secondDigit = new SlptHourLView();
+                    ((SlptNumView) secondDigit).setStringPictureArray(this.digitalNums);
+                    hourLayout.add(secondDigit);
+                } else {
+                    hourLayout.add(new SlptHourHView());
+                    hourLayout.add(new SlptHourLView());
+                    hourLayout.setStringPictureArrayForAll(this.digitalNums);
+                }
+                hourLayout.setTextAttrForAll(
+                        settings.hoursFontSize,
+                        settings.hoursColor,
+                        timeTypeFace
+                );
+                // Position based on screen on
+                hourLayout.alignX = 2;
+                hourLayout.alignY = 0;
+                hourLayout.setRect(
+                        (int) (2 * settings.hoursLeft + 640),
+                        (int) (((float) settings.font_ratio / 100) * settings.hoursFontSize)
+                );
+                hourLayout.setStart(
+                        -320,
+                        (int) (settings.hoursTop - ((float) settings.font_ratio / 100) * settings.hoursFontSize)
+                );
+                //Add it to the list
+                slpt_objects.add(hourLayout);
             }
-            hourLayout.setTextAttrForAll(
-                    settings.hoursFontSize,
-                    settings.hoursColor,
-                    timeTypeFace
-            );
-            // Position based on screen on
-            hourLayout.alignX = 2;
-            hourLayout.alignY=0;
-            hourLayout.setRect(
-                    (int) (2*settings.hoursLeft+640),
-                    (int) (settings.hoursFontSize)
-            );
-            hourLayout.setStart(
-                    -320,
-                    (int) (settings.hoursTop-((float)settings.font_ratio/100)*settings.hoursFontSize)
-            );
-            //Add it to the list
-            slpt_objects.add(hourLayout);
+
+            // Draw minutes
+            if (settings.minutesBool) {
+                SlptLinearLayout minuteLayout = new SlptLinearLayout();
+                minuteLayout.add(new SlptMinuteHView());
+                minuteLayout.add(new SlptMinuteLView());
+                minuteLayout.setStringPictureArrayForAll(this.digitalNums);
+                minuteLayout.setTextAttrForAll(
+                        settings.minutesFontSize,
+                        settings.minutesColor,
+                        timeTypeFace
+                );
+                // Position based on screen on
+                minuteLayout.alignX = 2;
+                minuteLayout.alignY = 0;
+                minuteLayout.setRect(
+                        (int) (2 * settings.minutesLeft + 640),
+                        (int) (((float) settings.font_ratio / 100) * settings.minutesFontSize)
+                );
+                minuteLayout.setStart(
+                        -320,
+                        (int) (settings.minutesTop - ((float) settings.font_ratio / 100) * settings.minutesFontSize)
+                );
+                //Add it to the list
+                slpt_objects.add(minuteLayout);
+            }
+
+            // Draw indicator
+            if (settings.indicatorBool) {
+                SlptLinearLayout indicatorLayout = new SlptLinearLayout();
+                SlptPictureView colon = new SlptPictureView();
+                colon.setStringPicture(":");
+                indicatorLayout.add(colon);
+                indicatorLayout.setTextAttrForAll(
+                        settings.indicatorFontSize,
+                        settings.indicatorColor,
+                        timeTypeFace
+                );
+                // Position based on screen on
+                indicatorLayout.alignX = 2;
+                indicatorLayout.alignY = 0;
+                indicatorLayout.setRect(
+                        (int) (2 * settings.indicatorLeft + 640),
+                        (int) (((float) settings.font_ratio / 100) * settings.indicatorFontSize)
+                );
+                indicatorLayout.setStart(
+                        -320,
+                        (int) (settings.indicatorTop - ((float) settings.font_ratio / 100) * settings.indicatorFontSize)
+                );
+                //Add it to the list
+                slpt_objects.add(indicatorLayout);
+            }
+
+            // Draw Seconds
+            if (settings.secondsBool ) { //&& (!settings.isVerge() || better_resolution)
+                SlptLinearLayout secondsLayout = new SlptLinearLayout();
+                secondsLayout.add(new SlptSecondHView());
+                secondsLayout.add(new SlptSecondLView());
+                secondsLayout.setTextAttrForAll(
+                        settings.secondsFontSize,
+                        settings.secondsColor,
+                        ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE)
+                );
+                // Position based on screen on
+                secondsLayout.alignX = 2;
+                secondsLayout.alignY = 0;
+                secondsLayout.setRect(
+                        (int) (2 * settings.secondsLeft + 640),
+                        (int) (((float) settings.font_ratio / 100) * settings.secondsFontSize)
+                );
+                secondsLayout.setStart(
+                        -320,
+                        (int) (settings.secondsTop - ((float) settings.font_ratio / 100) * settings.secondsFontSize)
+                );
+                //Add it to the list
+                slpt_objects.add(secondsLayout);
+            }
         }
 
-        // Draw minutes
-        if(settings.minutesBool){
-            SlptLinearLayout minuteLayout = new SlptLinearLayout();
-            minuteLayout.add(new SlptMinuteHView());
-            minuteLayout.add(new SlptMinuteLView());
-            minuteLayout.setStringPictureArrayForAll(this.digitalNums);
-            minuteLayout.setTextAttrForAll(
-                    settings.minutesFontSize,
-                    settings.minutesColor,
-                    timeTypeFace
-            );
-            // Position based on screen on
-            minuteLayout.alignX = 2;
-            minuteLayout.alignY=0;
-            minuteLayout.setRect(
-                    (int) (2*settings.minutesLeft+640),
-                    (int) (settings.minutesFontSize)
-            );
-            minuteLayout.setStart(
-                    -320,
-                    (int) (settings.minutesTop-((float)settings.font_ratio/100)*settings.minutesFontSize)
-            );
-            //Add it to the list
-            slpt_objects.add(minuteLayout);
-        }
+        if(settings.analog_clock) {
+            SlptAnalogHourView slptAnalogHourView = new SlptAnalogHourView();
+            slptAnalogHourView.setImagePicture(SimpleFile.readFileFromAssets(service, "timehand/8c/hour"+ ((settings.isVerge())?"_verge":"") +".png"));
+            slptAnalogHourView.alignX = (byte) 2;
+            slptAnalogHourView.alignY = (byte) 2;
+            slptAnalogHourView.setRect(320 + (settings.isVerge()?40:0), 320 + (settings.isVerge()?40:0));
+            slpt_objects.add(slptAnalogHourView);
 
-        // Draw indicator
-        if(settings.indicatorBool){
-            SlptLinearLayout indicatorLayout = new SlptLinearLayout();
-            SlptPictureView colon = new SlptPictureView();
-            colon.setStringPicture(":");
-            indicatorLayout.add(colon);
-            indicatorLayout.setTextAttrForAll(
-                    settings.indicatorFontSize,
-                    settings.indicatorColor,
-                    timeTypeFace
-            );
-            // Position based on screen on
-            indicatorLayout.alignX = 2;
-            indicatorLayout.alignY=0;
-            indicatorLayout.setRect(
-                    (int) (2*settings.indicatorLeft+640),
-                    (int) (settings.indicatorFontSize)
-            );
-            indicatorLayout.setStart(
-                    -320,
-                    (int) (settings.indicatorTop-((float)settings.font_ratio/100)*settings.indicatorFontSize)
-            );
-            //Add it to the list
-            slpt_objects.add(indicatorLayout);
-        }
+            SlptAnalogMinuteView slptAnalogMinuteView = new SlptAnalogMinuteView();
+            slptAnalogMinuteView.setImagePicture(SimpleFile.readFileFromAssets(service, "timehand/8c/minute"+ ((settings.isVerge())?"_verge":"") +".png"));
+            slptAnalogMinuteView.alignX = (byte) 2;
+            slptAnalogMinuteView.alignY = (byte) 2;
+            slptAnalogMinuteView.setRect(320 + (settings.isVerge()?40:0), 320 + (settings.isVerge()?40:0));
+            slpt_objects.add(slptAnalogMinuteView);
 
-        // Draw Seconds
-        if(settings.secondsBool){
-            SlptLinearLayout secondsLayout = new SlptLinearLayout();
-            secondsLayout.add(new SlptSecondHView());
-            secondsLayout.add(new SlptSecondLView());
-            secondsLayout.setTextAttrForAll(
-                    settings.secondsFontSize,
-                    settings.secondsColor,
-                    ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE)
-            );
-            // Position based on screen on
-            secondsLayout.alignX = 2;
-            secondsLayout.alignY = 0;
-            secondsLayout.setRect(
-                    (int) (2*settings.secondsLeft+640),
-                    (int) (settings.secondsFontSize)
-            );
-            secondsLayout.setStart(
-                    -320,
-                    (int) (settings.secondsTop-((float)settings.font_ratio/100)*settings.secondsFontSize)
-            );
-            //Add it to the list
-            slpt_objects.add(secondsLayout);
+            if(settings.secondsBool){
+                SlptAnalogSecondView slptAnalogSecondView = new SlptAnalogSecondView();
+                slptAnalogSecondView.setImagePicture(SimpleFile.readFileFromAssets(service, "timehand/8c/second"+ ((settings.isVerge())?"_verge":"") +".png"));
+                slptAnalogSecondView.alignX = (byte) 2;
+                slptAnalogSecondView.alignY = (byte) 2;
+                slptAnalogSecondView.setRect(320 + (settings.isVerge()?40:0), 320 + (settings.isVerge()?40:0));
+                slpt_objects.add(slptAnalogSecondView);
+            }
         }
 
         // Draw DATE (30.12.2018)
-        if(settings.date>0){
+        if(settings.date>0 && show_all){
             // Show or Not icon
             if (settings.dateIcon) {
                 SlptPictureView dateIcon = new SlptPictureView();
-                dateIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"icons/date.png") );
+                dateIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"26wc_":"slpt_" )+"icons/date.png") );
                 dateIcon.setStart(
                         (int) settings.dateIconLeft,
                         (int) settings.dateIconTop
@@ -497,7 +535,7 @@ public class MainClock extends DigitalClockWidget {
                 // If text is centered, set rectangle
                 dateLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.dateFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.dateFontSize)
                 );
                 tmp_left = -320;
             }
@@ -510,7 +548,7 @@ public class MainClock extends DigitalClockWidget {
         }
 
         // Draw day of month
-        if(settings.dayBool){
+        if(settings.dayBool && show_all){
             SlptLinearLayout dayLayout = new SlptLinearLayout();
             dayLayout.add(new SlptDayHView());
             dayLayout.add(new SlptDayLView());
@@ -526,7 +564,7 @@ public class MainClock extends DigitalClockWidget {
                 // If text is centered, set rectangle
                 dayLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.dayFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.dayFontSize)
                 );
                 tmp_left = -320;
             }
@@ -539,7 +577,7 @@ public class MainClock extends DigitalClockWidget {
         }
 
         // Draw month
-        if(settings.monthBool){
+        if(settings.monthBool && show_all){
             // JAVA calendar get/show time library
             Calendar calendar = Calendar.getInstance();
             int month = calendar.get(Calendar.MONTH);
@@ -587,7 +625,7 @@ public class MainClock extends DigitalClockWidget {
                 // If text is centered, set rectangle
                 monthLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.monthFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.monthFontSize)
                 );
                 tmp_left = -320;
             }
@@ -600,7 +638,7 @@ public class MainClock extends DigitalClockWidget {
         }
 
         // Draw year number
-        if(settings.yearBool){
+        if(settings.yearBool && show_all){
             SlptLinearLayout yearLayout = new SlptLinearLayout();
             yearLayout.add(new SlptYear3View());
             yearLayout.add(new SlptYear2View());
@@ -619,7 +657,7 @@ public class MainClock extends DigitalClockWidget {
                 // If text is centered, set rectangle
                 yearLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.yearFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.yearFontSize)
                 );
                 tmp_left = -320;
             }
@@ -635,7 +673,7 @@ public class MainClock extends DigitalClockWidget {
         Typeface weekfont = ResourceManager.getTypeFace(service.getResources(), ResourceManager.Font.FONT_FILE);
 
         // Draw day name
-        if(settings.weekdayBool){
+        if(settings.weekdayBool && show_all){
             SlptLinearLayout WeekdayLayout = new SlptLinearLayout();
             WeekdayLayout.add(new SlptWeekView());
             if(settings.three_letters_day_if_text){
@@ -656,7 +694,7 @@ public class MainClock extends DigitalClockWidget {
                 // If text is centered, set rectangle
                 WeekdayLayout.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) (settings.weekdayFontSize)
+                        (int) (((float)settings.font_ratio/100)*settings.weekdayFontSize)
                 );
                 tmp_left = -320;
             }

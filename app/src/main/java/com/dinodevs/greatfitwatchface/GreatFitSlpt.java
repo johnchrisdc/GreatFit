@@ -11,6 +11,7 @@ import com.dinodevs.greatfitwatchface.widget.FloorWidget;
 import com.dinodevs.greatfitwatchface.widget.HeartRateWidget;
 import com.dinodevs.greatfitwatchface.widget.MainClock;
 import com.dinodevs.greatfitwatchface.widget.GreatWidget;
+import com.dinodevs.greatfitwatchface.widget.MoonPhaseWidget;
 import com.dinodevs.greatfitwatchface.widget.SportTodayDistanceWidget;
 import com.dinodevs.greatfitwatchface.widget.SportTotalDistanceWidget;
 import com.dinodevs.greatfitwatchface.widget.StepsWidget;
@@ -40,6 +41,10 @@ public class GreatFitSlpt extends AbstractWatchFaceSlpt {
 
         this.clock = new MainClock(settings);
 
+        // Disable all except clock in both SLPT modes
+        //if(settings.clock_only_slpt)
+        //    return super.onStartCommand(intent, flags, startId);
+
         if(settings.isHeartRate()) {
             this.widgets.add(new HeartRateWidget(settings));
         }
@@ -63,6 +68,9 @@ public class GreatFitSlpt extends AbstractWatchFaceSlpt {
         }
         if(settings.isWeather()) {
             this.widgets.add(new WeatherWidget(settings));
+        }
+        if(settings.isMoonPhase()){
+            this.widgets.add(new MoonPhaseWidget(settings));
         }
         if(settings.isGreat()) {
             this.widgets.add(new GreatWidget(settings));
@@ -101,16 +109,18 @@ public class GreatFitSlpt extends AbstractWatchFaceSlpt {
         return result;
     }
 
-
     protected void initWatchFaceConfig() {
-        Log.w("DinoDevs-GreatFit", "Initiating watchface");
+        //Log.w("DinoDevs-GreatFit", "Initiating watchface");
+    }
 
-        //this.getResources().getBoolean(R.bool.seconds)
-
+    @Override
+    public boolean isClockPeriodSecond() {
         Context context = this.getApplicationContext();
         boolean needRefreshSecond = Util.needSlptRefreshSecond(context);
         if (needRefreshSecond) {
             this.setClockPeriodSecond(true);
         }
+        return needRefreshSecond;
     }
+
 }

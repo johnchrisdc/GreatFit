@@ -1,20 +1,21 @@
-[![latest release](https://img.shields.io/github/release/GreatApo/GreatFit.svg?colorB=green&label=latest%20release&style=flat-square) ![release date](https://img.shields.io/badge/release%20date-2019.01.16-orange.svg?style=flat-square) ![Downloads](https://img.shields.io/github/downloads/GreatApo/GreatFit/total.svg?style=flat-square) ![HitCount](http://hits.dwyl.io/GreatApo/GreatFit.svg)](https://github.com/GreatApo/GreatFit/releases/latest)
-# GreatFit: Amazfit Pace/Stratos APK Watchface sources
+[![latest release](https://img.shields.io/github/release/GreatApo/GreatFit.svg?colorB=green&label=latest%20release&style=flat-square) ![release date](https://img.shields.io/badge/release%20date-2019.05.24-orange.svg?style=flat-square) ![Downloads](https://img.shields.io/github/downloads/GreatApo/GreatFit/total.svg?style=flat-square) ![HitCount](http://hits.dwyl.io/GreatApo/GreatFit.svg)](https://github.com/GreatApo/GreatFit/releases/latest)
+# GreatFit: Amazfit Pace/Stratos/Verge APK Watchface sources
 ![GreatFit Watchface Banner](other/images/1.jpg)
 
-Bla, bla, bla... will write something here later :P continue reading for now
+ONE WATCHFACE TO RULE THEM ALL!
+
 XDA Topic [here](https://forum.xda-developers.com/smartwatch/amazfit/app-watchface-greatfit-v1-1-settings-t3791516)
 
 
 ### Features
-- This is a Pace/Stratos APK watchface (Pace WOS2)
-- Custom apk watchface with sources
-- Supported languages: English, Chinese, Croatian, Czech, Dutch, French, German, Greek, Hebrew, Hungarian, Italian, Japanese, Polish, Portuguese, Romanian, Russian, Slovak, Spanish, Thai, Turkish
+- This is a Pace/Stratos/Verge APK watchface
+- Custom apk watchface with open sources
+- Supports 21 languages: English, Bulgarian, Chinese, Croatian, Czech, Dutch, French, German, Greek, Hebrew, Hungarian, Italian, Japanese, Polish, Portuguese, Romanian, Russian, Slovak, Spanish, Thai, Turkish
 - Ability to change widgets/progress bars
 - Seconds are enabled based on your system settings (refresh the watchface)
 - More weather widgets (humidity, wind direction and strength, UV status, city)
 - New watch alarm widget
-- New air pressure, altitude/dive depth (calculated based on air pressure)
+- New air pressure, altitude/dive depth (calculated based on air pressure & temperature)
 - New xdrip values widget (will be supported with Xdrip by Klaus3d3)
 - New phone battery widget/bar (needs amazfit service+phone app)
 - New phone alarm widget (needs amazfit service+phone app)
@@ -22,9 +23,17 @@ XDA Topic [here](https://forum.xda-developers.com/smartwatch/amazfit/app-watchfa
 - New heart-rate progress bar (min 0 bpm, max 200 bpm)
 - New world time widget, you can select the time difference it displays
 - New notifications widget, see unread notifications (needs amazfit service+phone app)
+- New moonphase widget
 - Better image resolution when raising hand
+- Ability to show only time when screen is off (to save battery, doesn't apply on raise of hand screen)
 - Status bar position and enable/disable
 - Many other options available in settings
+
+
+### Bugs
+- Screen off mode not is sometimes not applied when saving the watchface, just change to an other and change back
+- Screen off mode shows widgets over old widgets, just change to an other and change back
+- Xdrip widget is not working
 
 
 ### Tutorial for devs and stylers
@@ -70,10 +79,10 @@ adb shell pm clear com.dinodevs.greatfitwatchface
 
 This project couldn't be possible without getting familiar with the source code provided by Manuel Alvarez (whose code is [here](https://github.com/manuel-alvarez-alvarez/malvarez-watchface)). Additional work has be done by Fabio Barbon (whose code is [here](https://github.com/drbourbon/drbourbon-watchfaces)), Luis Baena (@LBA97) and Saúl Alemán (@Nxsaul) (whose code is [here](https://github.com/Nxsaul/AmazfitAPKs)).
 
-Translations are ported from my Pace Calendar widget project (code [here](https://github.com/GreatApo/AmazfitPaceCalendarWidget), see translators in the changelog [here](https://forum.xda-developers.com/smartwatch/amazfit/app-widget-calendar-pace-t3751889)) and @GramThanos jsCalendar project (code [here](https://github.com/GramThanos/jsCalendar)).
+Translations are ported from my Pace Calendar widget project (code [here](https://github.com/GreatApo/AmazfitPaceCalendarWidget), see translators in the changelog [here](https://forum.xda-developers.com/smartwatch/amazfit/app-widget-calendar-pace-t3751889)), @GramThanos jsCalendar project (code [here](https://github.com/GramThanos/jsCalendar)) and by users here or on XDA (see changelog).
 
 Special thanks to:
-- @lfom and @GramThanos for helping me out
+- @lfom, @GramThanos, @renzettis and the rest of the Amazmod team for helping me out
 - @KieronQuinn for the settings style code (from his [AmazfitStepNotify](https://github.com/KieronQuinn/AmazfitStepNotify) app)
 - and all those invisible people giving back to the community by helping or donating!
 

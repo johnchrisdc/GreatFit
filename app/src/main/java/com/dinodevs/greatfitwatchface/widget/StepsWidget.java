@@ -77,7 +77,7 @@ public class StepsWidget extends AbstractWidget {
         // Steps class
         this.stepsData = (Steps) value;
         // Bar angle
-        this.stepsSweepAngle = (this.stepsData == null)? 0f : this.angleLength*((float) this.stepsData.getSteps()/this.stepsData.getTarget());
+        this.stepsSweepAngle = (this.stepsData == null)? 0f : this.angleLength*((float) (this.stepsData.getSteps()>this.stepsData.getTarget()?this.stepsData.getTarget():this.stepsData.getSteps())/this.stepsData.getTarget());
     }
 
     // Register update listeners
@@ -135,12 +135,17 @@ public class StepsWidget extends AbstractWidget {
         List<SlptViewComponent> slpt_objects = new ArrayList<>();
         int tmp_left;
 
+        // Do not show in SLPT (but show on raise of hand)
+        boolean show_all = (!settings.clock_only_slpt || better_resolution);
+        if (!show_all)
+            return slpt_objects;
+
         // Show steps
         if(settings.steps>0){
             // Show or Not icon
             if (settings.stepsIcon) {
                 SlptPictureView stepsIcon = new SlptPictureView();
-                stepsIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"icons/steps.png") );
+                stepsIcon.setImagePicture( SimpleFile.readFileFromAssets(service, ( (better_resolution)?"26wc_":"slpt_" )+"icons/steps.png") );
                 stepsIcon.setStart(
                         (int) settings.stepsIconLeft,
                         (int) settings.stepsIconTop
@@ -163,7 +168,7 @@ public class StepsWidget extends AbstractWidget {
                 // If text is centered, set rectangle
                 steps.setRect(
                         (int) (2 * tmp_left + 640),
-                        (int) settings.stepsFontSize
+                        (int) (((float)settings.font_ratio/100)*settings.stepsFontSize)
                 );
                 tmp_left = -320;
             }
@@ -186,13 +191,13 @@ public class StepsWidget extends AbstractWidget {
             // Draw background image
             if(settings.stepsProgBgBool) {
                 SlptPictureView ring_background = new SlptPictureView();
-                ring_background.setImagePicture(SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+"circles/ring1_bg.png"));
+                ring_background.setImagePicture(SimpleFile.readFileFromAssets(service, ((settings.isVerge())?"verge_":( (better_resolution)?"":"slpt_" ))+"circles/ring1_bg.png"));
                 ring_background.setStart((int) (settings.stepsProgLeft-settings.stepsProgRadius), (int) (settings.stepsProgTop-settings.stepsProgRadius));
                 slpt_objects.add(ring_background);
             }
 
             SlptTodayStepArcAnglePicView stepsArcAnglePicView = new SlptTodayStepArcAnglePicView();
-            stepsArcAnglePicView.setImagePicture(SimpleFile.readFileFromAssets(service, ( (better_resolution)?"":"slpt_" )+settings.stepsProgSlptImage));
+            stepsArcAnglePicView.setImagePicture(SimpleFile.readFileFromAssets(service, ((settings.isVerge())?"verge_":( (better_resolution)?"":"slpt_" ))+settings.stepsProgSlptImage));
             stepsArcAnglePicView.setStart((int) (settings.stepsProgLeft-settings.stepsProgRadius), (int) (settings.stepsProgTop-settings.stepsProgRadius));
             stepsArcAnglePicView.start_angle = (settings.stepsProgClockwise==1)? settings.stepsProgStartAngle : settings.stepsProgEndAngle;
             //stepsArcAnglePicView.start_angle = settings.stepsProgStartAngle;

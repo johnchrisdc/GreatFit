@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.dinodevs.greatfitwatchface.settings.LoadSettings;
 import com.dinodevs.greatfitwatchface.widget.FloorWidget;
+import com.dinodevs.greatfitwatchface.widget.MoonPhaseWidget;
 import com.dinodevs.greatfitwatchface.widget.SportTodayDistanceWidget;
 import com.dinodevs.greatfitwatchface.widget.SportTotalDistanceWidget;
 import com.dinodevs.greatfitwatchface.widget.StepsWidget;
@@ -59,6 +60,9 @@ public class GreatFit extends AbstractWatchFace {
         }
         if(settings.isWeather()) {
             this.widgets.add(new WeatherWidget(settings));
+        }
+        if (settings.isMoonPhase()){
+            this.widgets.add(new MoonPhaseWidget(settings));
         }
         if(settings.isGreat()) {
             this.widgets.add(new GreatWidget(settings));
